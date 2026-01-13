@@ -1,0 +1,330 @@
+{
+  "dashboard": {
+    "title": "USA Options AI - Real-time Market Monitoring",
+    "timezone": "utc",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "5s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Live Stock Prices",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"stock_prices\")\n  |> filter(fn: (r) => r._field == \"close\")",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10
+            },
+            "unit": "currencyUSD"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Prediction Accuracy",
+        "type": "gauge",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 6,
+          "h": 8
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r._measurement == \"predictions\")\n  |> filter(fn: (r) => r._field == \"accuracy\")\n  |> mean()",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "red"
+                },
+                {
+                  "value": 60,
+                  "color": "yellow"
+                },
+                {
+                  "value": 75,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Model Confidence",
+        "type": "gauge",
+        "gridPos": {
+          "x": 18,
+          "y": 0,
+          "w": 6,
+          "h": 8
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"predictions\")\n  |> filter(fn: (r) => r._field == \"confidence\")\n  |> mean()",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 1,
+            "unit": "percentunit",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "red"
+                },
+                {
+                  "value": 0.5,
+                  "color": "yellow"
+                },
+                {
+                  "value": 0.7,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Greeks - Delta",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 8,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"greeks\")\n  |> filter(fn: (r) => r._field == \"delta\")",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "lineWidth": 2
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Greeks - Gamma",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 8,
+          "y": 8,
+          "w": 8,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"greeks\")\n  |> filter(fn: (r) => r._field == \"gamma\")",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Greeks - Vega",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 16,
+          "y": 8,
+          "w": 8,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"greeks\")\n  |> filter(fn: (r) => r._field == \"vega\")",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Technical Indicators - RSI",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 14,
+          "w": 12,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"technical_indicators\")\n  |> filter(fn: (r) => r._field == \"rsi\")",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "lineWidth": 2
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 30,
+                  "color": "green"
+                },
+                {
+                  "value": 70,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Trading Signals",
+        "type": "table",
+        "gridPos": {
+          "x": 12,
+          "y": 14,
+          "w": 12,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT timestamp, symbol, signal_type, confidence, target_price, stop_loss FROM trading_signals ORDER BY timestamp DESC LIMIT 20",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Volume Profile",
+        "type": "barchart",
+        "gridPos": {
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"stock_prices\")\n  |> filter(fn: (r) => r._field == \"volume\")",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "System Health - Kafka Lag",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 20,
+          "w": 12,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "Prometheus",
+            "expr": "kafka_consumergroup_lag",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Volatility Surface",
+        "type": "heatmap",
+        "gridPos": {
+          "x": 0,
+          "y": 26,
+          "w": 24,
+          "h": 8
+        },
+        "targets": [
+          {
+            "datasource": "InfluxDB",
+            "query": "from(bucket: \"options_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"options\")\n  |> filter(fn: (r) => r._field == \"implied_volatility\")",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "hideFrom": {
+                "tooltip": false,
+                "viz": false,
+                "legend": false
+              }
+            },
+            "color": {
+              "mode": "scheme",
+              "scheme": "Spectral"
+            }
+          }
+        }
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "symbol",
+          "type": "query",
+          "datasource": "InfluxDB",
+          "query": "import \"influxdata/influxdb/schema\"\nschema.tagValues(bucket: \"options_data\", tag: \"symbol\")",
+          "multi": true,
+          "includeAll": true
+        }
+      ]
+    }
+  }
+}

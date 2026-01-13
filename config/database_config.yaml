@@ -1,0 +1,124 @@
+# Database Configuration
+
+# InfluxDB (Time Series Database)
+influxdb:
+  url: "http://localhost:8086"
+  token: "YOUR_INFLUXDB_TOKEN"  # Generate after setup
+  org: "usaoptionsai"
+  bucket: "market_data"
+  
+  # Additional buckets for organization
+  buckets:
+    raw_data: "raw_market_data"
+    processed_data: "processed_features"
+    predictions: "model_predictions"
+    signals: "trading_signals"
+  
+  # Retention policies
+  retention_policies:
+    raw_data: "7d"        # 7 days for raw tick data
+    processed_data: "30d" # 30 days for processed features
+    predictions: "90d"    # 90 days for predictions
+    signals: "365d"       # 1 year for trading signals
+  
+  # Connection settings
+  timeout: 30000  # milliseconds
+  verify_ssl: true
+
+# TimescaleDB (PostgreSQL with time series extensions)
+timescaledb:
+  host: "localhost"
+  port: 5432
+  database: "usaoptionsai"
+  user: "postgres"
+  password: "YOUR_TIMESCALEDB_PASSWORD"
+  
+  # Connection pool settings
+  pool_size: 10
+  max_overflow: 20
+  pool_timeout: 30
+  pool_recycle: 3600
+  
+  # SSL settings
+  sslmode: "prefer"  # disable, allow, prefer, require, verify-ca, verify-full
+  
+  # Schema names
+  schemas:
+    raw: "raw_data"
+    processed: "processed_data"
+    models: "ml_models"
+    signals: "trading_signals"
+    metadata: "system_metadata"
+
+# Redis (Caching and Real-time Features)
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""  # Set if authentication is enabled
+  db: 0
+  
+  # Additional databases for different purposes
+  databases:
+    cache: 0
+    sessions: 1
+    rate_limit: 2
+    pubsub: 3
+  
+  # Connection settings
+  socket_timeout: 5
+  socket_connect_timeout: 5
+  max_connections: 50
+  decode_responses: true
+  
+  # Cluster mode (for production)
+  cluster_enabled: false
+  # cluster_nodes:
+  #   - "redis-node1:6379"
+  #   - "redis-node2:6379"
+  #   - "redis-node3:6379"
+
+# MongoDB (Optional - for document storage)
+mongodb:
+  enabled: false
+  uri: "mongodb://localhost:27017"
+  database: "usaoptionsai"
+  
+  collections:
+    company_profiles: "company_profiles"
+    news_articles: "news_articles"
+    earnings_reports: "earnings_reports"
+    model_metadata: "model_metadata"
+  
+  # Connection settings
+  max_pool_size: 100
+  min_pool_size: 10
+  server_selection_timeout_ms: 30000
+
+# Database migration settings
+migrations:
+  auto_migrate: true
+  backup_before_migrate: true
+  backup_location: "./backups"
+
+# Query optimization
+query_settings:
+  default_limit: 1000
+  max_limit: 10000
+  query_timeout: 30  # seconds
+  enable_query_cache: true
+  cache_ttl: 300  # seconds
+
+# Backup settings
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  location: "/backups/databases"
+  compression: true
+
+# Monitoring
+monitoring:
+  enabled: true
+  slow_query_threshold: 1000  # milliseconds
+  log_queries: false  # Set true for debugging (performance impact)
+  metrics_collection: true

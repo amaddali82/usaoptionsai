@@ -1,0 +1,216 @@
+{
+  "dashboard": {
+    "title": "USA Options AI - Model Performance",
+    "timezone": "utc",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "30s",
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Model Prediction Accuracy Over Time",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 24,
+          "h": 8
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT time_bucket('5 minutes', timestamp) AS time, model_type, AVG(ABS(predicted_price - actual_price) / actual_price * 100) AS error FROM predictions WHERE actual_price IS NOT NULL GROUP BY time, model_type ORDER BY time",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10
+            },
+            "unit": "percent"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Short-term LSTM Performance",
+        "type": "stat",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 8,
+          "h": 4
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT AVG(confidence) AS avg_confidence FROM predictions WHERE model_type = 'short_term' AND timestamp > NOW() - INTERVAL '24 hours'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 0.6, "color": "yellow"},
+                {"value": 0.75, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Medium-term Transformer Performance",
+        "type": "stat",
+        "gridPos": {
+          "x": 8,
+          "y": 8,
+          "w": 8,
+          "h": 4
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT AVG(confidence) AS avg_confidence FROM predictions WHERE model_type = 'medium_term' AND timestamp > NOW() - INTERVAL '24 hours'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 0.6, "color": "yellow"},
+                {"value": 0.75, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "ARIMA Performance",
+        "type": "stat",
+        "gridPos": {
+          "x": 16,
+          "y": 8,
+          "w": 8,
+          "h": 4
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT COUNT(*) FROM predictions WHERE model_type = 'arima' AND timestamp > NOW() - INTERVAL '24 hours'",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Prediction vs Actual Price",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 12,
+          "w": 24,
+          "h": 8
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT timestamp, predicted_price, actual_price FROM predictions WHERE symbol = '$symbol' AND actual_price IS NOT NULL ORDER BY timestamp",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "custom": {
+              "lineWidth": 2
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "predicted_price"
+              },
+              "properties": [
+                {
+                  "id": "custom.lineStyle",
+                  "value": {
+                    "dash": [10, 10]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "title": "Prediction Error Distribution",
+        "type": "histogram",
+        "gridPos": {
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT (predicted_price - actual_price) AS error FROM predictions WHERE actual_price IS NOT NULL AND timestamp > NOW() - INTERVAL '7 days'",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Signal Success Rate",
+        "type": "piechart",
+        "gridPos": {
+          "x": 12,
+          "y": 20,
+          "w": 12,
+          "h": 6
+        },
+        "targets": [
+          {
+            "datasource": "TimescaleDB",
+            "rawSql": "SELECT signal_type, COUNT(*) as count FROM trading_signals WHERE timestamp > NOW() - INTERVAL '7 days' GROUP BY signal_type",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "symbol",
+          "type": "query",
+          "datasource": "TimescaleDB",
+          "query": "SELECT DISTINCT symbol FROM predictions ORDER BY symbol",
+          "multi": false
+        }
+      ]
+    }
+  }
+}

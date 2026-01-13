@@ -1,0 +1,66 @@
+# API Configuration Template
+# Copy this file to api_config.yaml and fill in your API keys
+
+# Polygon.io (Recommended for production)
+polygon:
+  api_key: "YOUR_POLYGON_API_KEY"
+  base_url: "https://api.polygon.io"
+  rate_limit: 5  # requests per second (depends on your plan)
+  timeout: 30
+
+# Alpha Vantage (Free tier available)
+alpha_vantage:
+  api_key: "YOUR_ALPHA_VANTAGE_API_KEY"
+  base_url: "https://www.alphavantage.co"
+  rate_limit: 5  # 5 requests per minute for free tier
+  timeout: 30
+
+# Finnhub (News and sentiment)
+finnhub:
+  api_key: "YOUR_FINNHUB_API_KEY"
+  base_url: "https://finnhub.io/api/v1"
+  rate_limit: 60  # requests per minute (free tier)
+  timeout: 30
+
+# Yahoo Finance (Free, via yfinance library)
+yahoo_finance:
+  enabled: true
+  rate_limit: 2000  # requests per hour
+  timeout: 30
+
+# IEX Cloud (Alternative provider)
+iex_cloud:
+  api_key: "YOUR_IEX_CLOUD_TOKEN"
+  base_url: "https://cloud.iexapis.com/stable"
+  sandbox_mode: false
+  rate_limit: 100
+  timeout: 30
+
+# News API (for sentiment analysis)
+news_api:
+  api_key: "YOUR_NEWS_API_KEY"
+  base_url: "https://newsapi.org/v2"
+  rate_limit: 100  # requests per day (free tier)
+  timeout: 30
+
+# Quandl (Economic data)
+quandl:
+  api_key: "YOUR_QUANDL_API_KEY"
+  base_url: "https://www.quandl.com/api/v3"
+  rate_limit: 50
+  timeout: 30
+
+# General settings
+general:
+  retry_attempts: 3
+  retry_delay: 2  # seconds
+  cache_enabled: true
+  cache_ttl: 300  # seconds (5 minutes)
+  log_level: "INFO"
+  
+# API priorities (order of preference)
+api_priority:
+  options_data: ["polygon", "alpha_vantage", "yahoo_finance"]
+  stock_prices: ["polygon", "yahoo_finance", "alpha_vantage"]
+  news_sentiment: ["finnhub", "news_api"]
+  fundamentals: ["alpha_vantage", "polygon", "iex_cloud"]

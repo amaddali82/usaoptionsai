@@ -1,0 +1,113 @@
+# Core Data Science and ML
+numpy==1.24.3
+pandas==2.0.3
+scikit-learn==1.3.0
+scipy==1.11.1
+
+# Deep Learning Frameworks
+tensorflow==2.13.0
+torch==2.0.1
+torchvision==0.15.2
+
+# Financial and Quantitative Analysis
+yfinance==0.2.28
+ta==0.11.0  # Technical analysis library
+QuantLib==1.31
+py_vollib==1.0.1  # Options pricing and implied volatility
+pandas-ta==0.3.14b
+
+# Data Ingestion and APIs
+requests==2.31.0
+requests-cache==1.1.0
+polygon-api-client==1.12.2
+alpha-vantage==2.3.1
+finnhub-python==2.4.18
+websocket-client==1.6.1
+
+# Stream Processing
+kafka-python==2.0.2
+pyspark==3.4.1
+streamparse==4.0.0  # Apache Storm
+
+# Databases
+influxdb-client==1.37.0
+psycopg2-binary==2.9.6  # PostgreSQL/TimescaleDB
+sqlalchemy==2.0.19
+redis==4.6.0
+
+# API Development
+fastapi==0.101.0
+uvicorn==0.23.2
+pydantic==2.1.1
+python-multipart==0.0.6
+
+# Visualization
+plotly==5.15.0
+dash==2.12.1
+dash-bootstrap-components==1.4.2
+matplotlib==3.7.2
+seaborn==0.12.2
+
+# Configuration and Utilities
+pyyaml==6.0.1
+python-dotenv==1.0.0
+click==8.1.6
+tqdm==4.65.0
+joblib==1.3.1
+
+# Testing
+pytest==7.4.0
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+pytest-asyncio==0.21.1
+
+# Logging and Monitoring
+prometheus-client==0.17.1
+python-json-logger==2.0.7
+structlog==23.1.0
+
+# NLP and Sentiment Analysis
+transformers==4.31.0
+nltk==3.8.1
+textblob==0.17.1
+vaderSentiment==3.3.2
+
+# Time Series Analysis
+statsmodels==0.14.0
+pmdarima==2.0.3  # Auto ARIMA
+prophet==1.1.4
+arch==6.2.0  # GARCH models
+
+# Feature Engineering
+featuretools==1.27.0
+category-encoders==2.6.1
+
+# Model Serving
+tensorflow-serving-api==2.13.0
+mlflow==2.5.0
+
+# Parallel Processing
+dask==2023.7.1
+dask[dataframe]
+ray==2.6.1
+
+# Development Tools
+black==23.7.0
+flake8==6.0.0
+mypy==1.4.1
+ipython==8.14.0
+jupyter==1.0.0
+notebook==7.0.0
+
+# Cloud (optional, uncomment as needed)
+# boto3==1.28.17  # AWS
+# google-cloud-storage==2.10.0  # GCP
+# azure-storage-blob==12.17.0  # Azure
+
+# Kubernetes client (if deploying to K8s)
+# kubernetes==27.2.0
+
+# Additional utilities
+pytz==2023.3
+python-dateutil==2.8.2
+cachetools==5.3.1

@@ -1,0 +1,261 @@
+# Machine Learning Models Configuration
+
+# General ML settings
+general:
+  random_seed: 42
+  train_test_split: 0.8
+  validation_split: 0.1
+  cross_validation_folds: 5
+  early_stopping_patience: 10
+  checkpoint_dir: "./models/checkpoints"
+  model_save_dir: "./models/saved_models"
+
+# Short-term prediction models (Intraday to 1 week)
+short_term:
+  # CNN for Limit Order Book (LOB) imaging
+  cnn_lob:
+    enabled: true
+    architecture:
+      input_shape: [100, 40, 1]  # [time_steps, features, channels]
+      conv_layers:
+        - filters: 32
+          kernel_size: [3, 3]
+          activation: "relu"
+          pool_size: [2, 2]
+        - filters: 64
+          kernel_size: [3, 3]
+          activation: "relu"
+          pool_size: [2, 2]
+      dense_layers:
+        - units: 128
+          activation: "relu"
+          dropout: 0.3
+        - units: 64
+          activation: "relu"
+          dropout: 0.2
+      output_units: 3  # Buy/Hold/Sell
+    training:
+      batch_size: 64
+      epochs: 100
+      learning_rate: 0.001
+      optimizer: "adam"
+      loss: "categorical_crossentropy"
+  
+  # LSTM with sentiment integration
+  lstm_sentiment:
+    enabled: true
+    architecture:
+      sequence_length: 60  # 1 hour of minute data
+      lstm_units: [128, 64]
+      dropout: 0.2
+      recurrent_dropout: 0.2
+      attention: true
+      bidirectional: false
+      dense_layers:
+        - units: 32
+          activation: "relu"
+      output_units: 1  # Price prediction
+    training:
+      batch_size: 32
+      epochs: 50
+      learning_rate: 0.0001
+      optimizer: "adam"
+      loss: "mse"
+    features:
+      price_features: ["open", "high", "low", "close", "volume"]
+      technical_indicators: ["rsi", "macd", "bollinger_bands", "stochastic"]
+      sentiment_features: ["news_sentiment", "social_sentiment", "options_flow"]
+
+# Medium-term prediction models (1 week to 3 months)
+medium_term:
+  # Transformer model
+  transformer:
+    enabled: true
+    architecture:
+      sequence_length: 252  # Trading days in a year
+      d_model: 128
+      num_heads: 8
+      num_encoder_layers: 4
+      dim_feedforward: 512
+      dropout: 0.1
+      output_units: 1
+    training:
+      batch_size: 16
+      epochs: 100
+      learning_rate: 0.0001
+      optimizer: "adam"
+      loss: "mse"
+      scheduler: "cosine_annealing"
+  
+  # GRU model
+  gru:
+    enabled: true
+    architecture:
+      sequence_length: 60  # 60 days
+      gru_units: [256, 128, 64]
+      dropout: 0.2
+      dense_layers:
+        - units: 32
+          activation: "relu"
+      output_units: 1
+    training:
+      batch_size: 32
+      epochs: 50
+      learning_rate: 0.001
+      optimizer: "adam"
+      loss: "mse"
+  
+  # ARIMA (Statistical)
+  arima:
+    enabled: true
+    parameters:
+      order: [5, 1, 0]  # (p, d, q) - auto-tuned with pmdarima
+      seasonal_order: [1, 1, 1, 12]  # (P, D, Q, s)
+      auto_tune: true
+      information_criterion: "aic"
+    
+  # Support Vector Machine
+  svm:
+    enabled: true
+    parameters:
+      kernel: "rbf"
+      C: 1.0
+      gamma: "scale"
+      epsilon: 0.1
+
+# Long-term prediction models (3+ months)
+long_term:
+  # Deep learning with fundamentals
+  fundamental_dl:
+    enabled: true
+    architecture:
+      input_features: 50  # Fundamental ratios and indicators
+      hidden_layers:
+        - units: 256
+          activation: "relu"
+          dropout: 0.3
+        - units: 128
+          activation: "relu"
+          dropout: 0.2
+        - units: 64
+          activation: "relu"
+          dropout: 0.1
+      output_units: 1
+    training:
+      batch_size: 64
+      epochs: 200
+      learning_rate: 0.001
+      optimizer: "adam"
+      loss: "mse"
+    features:
+      fundamental_ratios: ["pe_ratio", "pb_ratio", "roe", "debt_to_equity", "current_ratio"]
+      growth_metrics: ["revenue_growth", "earnings_growth", "fcf_growth"]
+      macro_indicators: ["gdp_growth", "interest_rates", "inflation", "unemployment"]
+  
+  # Ensemble model
+  ensemble:
+    enabled: true
+    base_models: ["lstm", "transformer", "fundamental_dl"]
+    aggregation_method: "weighted_average"  # or "stacking"
+    weights: [0.4, 0.4, 0.2]  # For weighted average
+
+# Quantitative finance models
+quantitative:
+  # Black-Scholes
+  black_scholes:
+    enabled: true
+    parameters:
+      risk_free_rate: 0.05  # 5% annual
+      dividend_yield: 0.02  # 2% annual
+  
+  # Heston stochastic volatility
+  heston:
+    enabled: true
+    parameters:
+      kappa: 2.0  # Mean reversion speed
+      theta: 0.04  # Long-term variance
+      sigma: 0.3  # Volatility of volatility
+      rho: -0.7  # Correlation
+      v0: 0.04  # Initial variance
+  
+  # Greeks calculation
+  greeks:
+    enabled: true
+    methods: ["analytical", "numerical"]
+    numerical_method: "finite_difference"
+    epsilon: 0.01  # For numerical derivatives
+  
+  # Monte Carlo simulation
+  monte_carlo:
+    enabled: true
+    parameters:
+      num_simulations: 10000
+      time_steps: 252  # Daily steps
+      antithetic_variates: true
+      control_variates: false
+
+# Feature engineering
+feature_engineering:
+  # Technical indicators
+  technical:
+    moving_averages: [5, 10, 20, 50, 200]
+    rsi_period: 14
+    macd: [12, 26, 9]
+    bollinger_bands: [20, 2]
+    atr_period: 14
+    stochastic: [14, 3]
+  
+  # Sentiment features
+  sentiment:
+    news_lookback_days: 7
+    social_media_sources: ["twitter", "reddit", "stocktwits"]
+    sentiment_model: "vader"  # or "transformers" for deep learning
+  
+  # Options-specific features
+  options:
+    iv_percentile_lookback: 252
+    put_call_ratio_period: 20
+    max_pain_calculation: true
+    gamma_exposure: true
+
+# Model serving
+serving:
+  framework: "tensorflow_serving"  # or "torchserve"
+  port: 8501
+  batch_size: 32
+  timeout_ms: 5000
+  model_versioning: true
+  a_b_testing: false
+
+# MLOps and monitoring
+mlops:
+  experiment_tracking: "mlflow"
+  model_registry: true
+  auto_retraining:
+    enabled: true
+    schedule: "0 0 * * 0"  # Weekly on Sunday at midnight
+    trigger_on_drift: true
+    performance_threshold: 0.95  # Retrain if accuracy drops below 95%
+  
+  monitoring:
+    drift_detection: true
+    feature_drift_threshold: 0.1
+    prediction_drift_threshold: 0.1
+    alert_on_anomaly: true
+    
+# Hyperparameter tuning
+hyperparameter_tuning:
+  enabled: false  # Set true for extensive tuning (resource-intensive)
+  method: "optuna"  # or "grid_search", "random_search"
+  n_trials: 100
+  timeout: 3600  # seconds
+  optimization_metric: "val_loss"
+  direction: "minimize"
+
+# Performance optimization
+performance:
+  mixed_precision: true  # For faster training on GPUs
+  use_gpu: true
+  gpu_memory_growth: true
+  num_workers: 4  # Data loading threads
+  prefetch_factor: 2

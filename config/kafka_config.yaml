@@ -1,0 +1,85 @@
+# Apache Kafka Configuration
+
+# Broker settings
+brokers:
+  - "localhost:9092"  # Add more brokers for production: "broker2:9092", "broker3:9092"
+
+# Topics configuration
+topics:
+  # Raw data topics
+  raw_options_chains: "raw.options.chains"
+  raw_stock_prices: "raw.stock.prices"
+  raw_news_sentiment: "raw.news.sentiment"
+  raw_fundamentals: "raw.fundamentals"
+  
+  # Processed data topics
+  processed_features: "processed.features"
+  processed_indicators: "processed.indicators"
+  
+  # Prediction topics
+  predictions_short_term: "predictions.short_term"
+  predictions_medium_term: "predictions.medium_term"
+  predictions_long_term: "predictions.long_term"
+  
+  # Signal topics
+  trading_signals: "trading.signals"
+  risk_alerts: "risk.alerts"
+
+# Topic creation settings
+topic_config:
+  num_partitions: 6
+  replication_factor: 1  # Increase to 3 for production
+  retention_ms: 604800000  # 7 days
+  compression_type: "gzip"
+
+# Producer settings
+producer:
+  acks: "all"  # 'all' for strong durability, '1' for balance, '0' for speed
+  retries: 3
+  batch_size: 16384  # bytes
+  linger_ms: 10  # wait up to 10ms to batch messages
+  buffer_memory: 33554432  # 32MB
+  compression_type: "gzip"
+  max_in_flight_requests_per_connection: 5
+  enable_idempotence: true
+
+# Consumer settings
+consumer:
+  group_id: "usaoptionsai-consumer-group"
+  auto_offset_reset: "latest"  # 'earliest' or 'latest'
+  enable_auto_commit: false  # Manual commit for better control
+  max_poll_records: 500
+  max_poll_interval_ms: 300000  # 5 minutes
+  session_timeout_ms: 30000
+  heartbeat_interval_ms: 3000
+  fetch_min_bytes: 1
+  fetch_max_wait_ms: 500
+
+# Serialization
+serialization:
+  key_serializer: "StringSerializer"
+  value_serializer: "JSONSerializer"  # or "AvroSerializer" for schema registry
+  key_deserializer: "StringDeserializer"
+  value_deserializer: "JSONDeserializer"
+
+# Schema Registry (if using Avro)
+schema_registry:
+  enabled: false
+  url: "http://localhost:8081"
+
+# Security (for production)
+security:
+  protocol: "PLAINTEXT"  # or "SSL", "SASL_SSL", "SASL_PLAINTEXT"
+  # ssl_cafile: "/path/to/ca-cert"
+  # ssl_certfile: "/path/to/client-cert"
+  # ssl_keyfile: "/path/to/client-key"
+  # sasl_mechanism: "PLAIN"
+  # sasl_username: "username"
+  # sasl_password: "password"
+
+# Monitoring
+monitoring:
+  metrics_enabled: true
+  metrics_port: 9090
+  jmx_enabled: true
+  jmx_port: 9999
