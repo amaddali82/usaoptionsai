@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # InfluxDB (Time-Series Database)
+  influxdb:
+    image: influxdb:2.7
+    container_name: usaoptionsai-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpass123
+      - DOCKER_INFLUXDB_INIT_ORG=usaoptionsai
+      - DOCKER_INFLUXDB_INIT_BUCKET=options_data
+      - DOCKER_INFLUXDB_INIT_RETENTION=30d
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    networks:
+      - optionsai-network
+
+  # TimescaleDB (PostgreSQL with Time-Series Extension)
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: usaoptionsai-timescaledb
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=options_db
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+    networks:
+      - optionsai-network
+
+  # Redis (Caching Layer)
+  redis:
+    image: redis:7-alpine
+    container_name: usaoptionsai-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - optionsai-network
+
+  # Grafana (Visualization)
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: usaoptionsai-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+      - timescaledb
+    networks:
+      - optionsai-network
+
+networks:
+  optionsai-network:
+    driver: bridge
+
+volumes:
+  influxdb-data:
+  timescaledb-data:
+  redis-data:
+  grafana-data:
