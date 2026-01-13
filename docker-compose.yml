@@ -170,6 +170,27 @@ services:
     networks:
       - optionsai-network
 
+  # Options Trading Dashboard (ML Prediction Dashboard)
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: usaoptionsai-dashboard
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./data:/app/data
+      - ./saved_models:/app/saved_models
+      - ./visualization:/app/visualization
+      - ./config:/app/config
+      - ./models:/app/models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONIOENCODING=utf-8
+    networks:
+      - optionsai-network
+    restart: unless-stopped
+
 volumes:
   zookeeper-data:
   zookeeper-logs:
